@@ -7,6 +7,7 @@ You must test your agent's strength against a set of agents with known
 relative strength using tournament.py and include the results in your report.
 """
 import random
+import re
 
 
 class Timeout(Exception):
@@ -170,70 +171,50 @@ class CustomPlayer:
 
         # TODO: finish this function!
         # raise NotImplementedError
-        # print("<<<<<<<<<<< Minimax 1 depth:", depth)
-        # print( game.print_board2(depth))
+        print("<<<<<<<<<<< Minimax 1 depth:", depth)
+        print( game.print_board2(depth))
         moves = game.get_legal_moves() 
 
-        # Determine if the limit of search has been reached, or if the 
-        # level is a minimizing level, or if the level is a maximizing
-        # level:
-        # 1a. If the limit of search has been reached, compute the
-        #     static value of the current position relative to the 
-        #     appropiate player. Report the result
-        # 1b  If the level is a minimizing level, use MINIMAX on the
-        #     children of the current position. Report the minimun
-        #     of the result.
-        # 1c  Otherwise, the level is maximizing level. use MINIMAX
-        #     on the children of the current position. Report 
-        #     the maximun of the result.
-        # print("Movimientos: ", moves)
-        # print("Utility: " , game.utility(game.active_player) )
+        print("Movimientos: ", moves)
+        print("Utility: " , game.utility(game.active_player) , " active player: " , game.active_player)
 
-        # Determine if the limit of search has been reached
-        # se alcanza si depth == 1, ya llegamos al final del arbol
-        # o si no hay movimientos para este nivel...
-        
-        ret = float("inf")
-        movRet = (-1, -1)
-        if (depth == 1):
-            # ya llegamos al final
-            if(maximizing_player == True):
-                ret = float("-inf")
-            else:
-                ret = float("inf")
-            movRet = (-1, -1)
-            for move in moves:
-                nuevo_tablero = game.forecast_move(move)
-                score = self.score(nuevo_tablero,game.__player_1__)
-                if (maximizing_player == True):
-                    if (score > ret ):
-                        ret = score
-                        movRet = move
-                else:
-                    if (score < ret ):
-                        ret = score
-                        movRet = move
+        if(maximizing_player == True):
+            ret = float("-inf")
         else:
-            # 1b  If the level is a minimizing level, use MINIMAX on the
-            # checar si es minimax level
-            if(maximizing_player == True):
-                ret = float("-inf")
-            else:
-                ret = float("inf")
-            movRet = (-1, -1)
+            ret = float("inf")
+        movRet = (-1, -1)
+
+        if ( depth ==  1 ):
             for move in moves:
+                # generar un nuevo tablero con este nodo
+                # nuevo_tablero = game.copy()
                 nuevo_tablero = game.forecast_move(move)
-                score, movTemp = self.minimax(nuevo_tablero, depth-1, not maximizing_player) 
+
+                print(move)
+                print(nuevo_tablero.print_board2(depth))
                 if(maximizing_player == True):
+                    score = self.score(nuevo_tablero,game.__player_1__)
                     if (score > ret ):
                         ret = score
                         movRet = move
-                        # print("Uno score:", score, " move:", movRet, " depth:", depth)
                 else:
+                    score = self.score(nuevo_tablero,game.__player_2__)
                     if (score < ret ):
                         ret = score
                         movRet = move
-                        # print("Dos score:", score, " move:", movRet, " depth:", depth)
+
+            print("      score: ", score)
+        else:
+            for move in moves:
+                # generar un nuevo tablero con este nodo
+                # nuevo_tablero = game.copy()
+                nuevo_tablero = game.forecast_move(move)
+                print(move)
+                print(nuevo_tablero.print_board2(depth))
+                score, movRet = self.minimax(nuevo_tablero, depth -1, not maximizing_player)
+
+        # si el player es player2 regresa el menor valor del score, 
+        # si es player 1 regresa el mayor
 
         return ret, movRet
 
@@ -274,83 +255,5 @@ class CustomPlayer:
 
         # TODO: finish this function!
         # raise NotImplementedError
-
-        
-        # TODO: finish this function!
-        # raise NotImplementedError
         print("------------- alphabeta")
-        print("<<<<<<<<<<< Alpha-beta 1 depth:", depth)
-        # print( game.print_board2(depth))
-        moves = game.get_legal_moves() 
-
-        # Determine if the limit of search has been reached, or if the 
-        # level is a minimizing level, or if the level is a maximizing
-        # level:
-        # 1a. If the limit of search has been reached, compute the
-        #     static value of the current position relative to the 
-        #     appropiate player. Report the result
-        # 1b  If the level is a minimizing level, use MINIMAX on the
-        #     children of the current position. Report the minimun
-        #     of the result.
-        # 1c  Otherwise, the level is maximizing level. use MINIMAX
-        #     on the children of the current position. Report 
-        #     the maximun of the result.
-        print("AB Movimientos: ", moves)
-        print("Utility: " , game.utility(game.active_player) )
-
-        # Determine if the limit of search has been reached
-        # se alcanza si depth == 1, ya llegamos al final del arbol
-        # o si no hay movimientos para este nivel...
-        
-        ret = float("inf")
-        movRet = (-1, -1)
-        if (depth == 1):
-            # ya llegamos al final
-            if(maximizing_player == True):
-                ret = float("-inf")
-            else:
-                ret = float("inf")
-            movRet = (-1, -1)
-            for move in moves:
-                nuevo_tablero = game.forecast_move(move)
-                score = self.score(nuevo_tablero,game.__player_1__)
-                if (maximizing_player == True):
-                    if (score > ret ):
-                        ret = score
-                        movRet = move
-                    if (ret > alpha):
-                        alpha = ret
-                else:
-                    if (score < ret ):
-                        ret = score
-                        movRet = move
-                    if(ret < beta) :
-                        beta = ret
-                print("AB1 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
-        else:
-            # 1b  If the level is a minimizing level, use MINIMAX on the
-            # checar si es minimax level
-            print("Alpha-Beta depth > 1: ", depth)
-            if(maximizing_player == True):
-                ret = float("-inf")
-            else:
-                ret = float("inf")
-            movRet = (-1, -1)
-            for move in moves:
-                nuevo_tablero = game.forecast_move(move)
-                score, movTemp = self.alphabeta(nuevo_tablero, depth-1, alpha, beta, not maximizing_player) 
-                if(maximizing_player == True):
-                    if (score > ret ):
-                        ret = score
-                        movRet = move
-                    if (ret > alpha):
-                        alpha = ret
-                else:
-                    if (score < ret ):
-                        ret = score
-                        movRet = move
-                    if(ret < beta) :
-                        beta = ret
-                print("AB2 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
-
-        return ret, movRet
+        return 1.0, (1,2)

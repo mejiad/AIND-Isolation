@@ -296,6 +296,39 @@ class Board(object):
 
         return out
 
+        
+    def print_board2(self, depth):
+        """
+        Generate a string representation of the current game state, marking
+        the location of each player and indicating which cells have been
+        blocked, and which remain open.
+        """
+
+        p1_r, p1_c = self.__last_player_move__[self.__player_1__]
+        p2_r, p2_c = self.__last_player_move__[self.__player_2__]
+
+        out = ''
+        tab = ". " * depth
+
+        for i in range(self.height):
+            out += tab + ' | ' 
+
+            for j in range(self.width):
+
+                if not self.__board_state__[i][j]:
+                    out += ' '
+                elif i == p1_r and j == p1_c:
+                    out += '1'
+                elif i == p2_r and j == p2_c:
+                    out += '2'
+                else:
+                    out += '-'
+
+                out += ' | '
+            out += '\n\r'
+
+        return out
+
     def play(self, time_limit=TIME_LIMIT_MILLIS):
         """
         Execute a match between the players by alternately soliciting them
