@@ -327,6 +327,15 @@ class CustomPlayer:
                     if(ret < beta) :
                         beta = ret
                 print("AB1 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
+                if (maximizing_player == True):
+                    if (alpha >= beta) :
+                        print("ALPHA > BETA 1 !")
+                        return alpha, move
+                else:
+                    if (alpha >= beta) :
+                        print("ALPHA > BETA 1 !")
+                        return beta, move
+
         else:
             # 1b  If the level is a minimizing level, use MINIMAX on the
             # checar si es minimax level
@@ -352,5 +361,13 @@ class CustomPlayer:
                     if(ret < beta) :
                         beta = ret
                 print("AB2 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
+                if (maximizing_player == True):
+                    if (alpha >= beta) :
+                        print("ALPHA > BETA 1 !")
+                        return alpha, move
+                else:
+                    if (alpha >= beta) :
+                        print("ALPHA > BETA 1 !")
+                        return beta, move
 
         return ret, movRet

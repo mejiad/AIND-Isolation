@@ -459,6 +459,7 @@ class Project1Test(unittest.TestCase):
         counts = [(8, 8), (17, 10), (74, 42), (139, 51), (540, 119)]
 
         for idx in range(len(counts)):
+            print("COUNTS: ", counts[idx])
             test_depth = idx + 1  # pruning guarantee requires min depth of 3
             first_branch = []
             heuristic = makeBranchEval(first_branch)
@@ -486,7 +487,7 @@ class Project1Test(unittest.TestCase):
 
 
     @timeout(20)
-    @unittest.skip("Skip iterative deepening test.")  # Uncomment this line to skip test
+    # @unittest.skip("Skip iterative deepening test.")  # Uncomment this line to skip test
     def test_get_move(self):
         """ Test iterative deepening in CustomPlayer.get_move by placing an
         agent on the game board and performing ID minimax search, which
