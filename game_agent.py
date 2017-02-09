@@ -123,22 +123,43 @@ class CustomPlayer:
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
+        # print("=======\t\tget_move iself.iterative: ", self.iterative, " method:", self.method)
+        posAnterior = (-1,-1)
 
         try:
             # The search method call (alpha beta or minimax) should happen in
             # here in order to avoid timeout. The try/except block will
             # automatically catch the exception raised by the search method
             # when the timer gets close to expiring
-            pass
+            if self.iterative == True:
+                depth = 1
+                while True:
+                    if (self.method == "minimax"):
+                        print("\t\t\t------------------------ Time left:", time_left())
+                        score, pos =  self.minimax(game, depth, True)
+                        depth = depth + 1
+                        posAnterior = pos
+                    else: 
+                        if (self.method == "alphabeta"):
+                            # print("\t\t\t------------------------ Time left:", time_left())
+                            score, pos =  self.alphabeta(game, depth, float("-inf"), float("inf"), True)
+                            depth = depth + 1
+                            posAnterior = pos
+            else:
+                # print("No iterative depth:", self.search_depth, " de game w:", game.width, " h:", game.height)
+                score, pos = self.minimax(game, self.search_depth, True)
+            # pass
 
         except Timeout:
             # Handle any actions required at timeout, if necessary
-            pass
+            # pass
+            # print("SE ACABO el tiempo")
+            return posAnterior
 
         # Return the best move from the last completed search iteration
         # raise NotImplementedError
-        print("=============== get_move")
-        return legal_moves[0] 
+        # print("time_left:", self.time_left(), " thresold:", self.TIMER_THRESHOLD )
+        return pos
 
     def minimax(self, game, depth, maximizing_player=True):
         """Implement the minimax search algorithm as described in the lectures.
@@ -166,6 +187,7 @@ class CustomPlayer:
             The best move for the current branch; (-1, -1) for no legal moves
         """
         if self.time_left() < self.TIMER_THRESHOLD:
+            # print("+++++++++++++++++++ TIMEOUT dentro de minimax ++++++++++++++++")
             raise Timeout()
 
         # TODO: finish this function!
@@ -192,7 +214,10 @@ class CustomPlayer:
         # Determine if the limit of search has been reached
         # se alcanza si depth == 1, ya llegamos al final del arbol
         # o si no hay movimientos para este nivel...
-        
+        if (game.utility(game.active_player) != 0):
+            # print("minimax debe salir!")
+            return  game.utility(game.active_player), (-1,-1)
+
         ret = float("inf")
         movRet = (-1, -1)
         if (depth == 1):
@@ -205,6 +230,7 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score = self.score(nuevo_tablero,game.__player_1__)
+                # score = self.score(nuevo_tablero,game.active_player)
                 if (maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -224,6 +250,7 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score, movTemp = self.minimax(nuevo_tablero, depth-1, not maximizing_player) 
+
                 if(maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -270,7 +297,10 @@ class CustomPlayer:
             The best move for the current branch; (-1, -1) for no legal moves
         """
         if self.time_left() < self.TIMER_THRESHOLD:
+            # print("+++++++++++++++++++ TIMEOUT dentro de alphabeta ++++++++++++++++")
             raise Timeout()
+            print("TIMEOUT")
+
 
         # TODO: finish this function!
         # raise NotImplementedError
@@ -278,8 +308,8 @@ class CustomPlayer:
         
         # TODO: finish this function!
         # raise NotImplementedError
-        print("------------- alphabeta")
-        print("<<<<<<<<<<< Alpha-beta 1 depth:", depth)
+        # print("------------- alphabeta")
+        # print("<<<<<<<<<<< Alpha-beta 1 depth:", depth)
         # print( game.print_board2(depth))
         moves = game.get_legal_moves() 
 
@@ -295,8 +325,13 @@ class CustomPlayer:
         # 1c  Otherwise, the level is maximizing level. use MINIMAX
         #     on the children of the current position. Report 
         #     the maximun of the result.
-        print("AB Movimientos: ", moves)
-        print("Utility: " , game.utility(game.active_player) )
+        # print("AB Movimientos: ", moves)
+
+
+        # TODO: agregar utility
+        if (game.utility(game.active_player) != 0):
+            # print("alphabeta debe salir!")
+            return  game.utility(game.active_player), (-1,-1)
 
         # Determine if the limit of search has been reached
         # se alcanza si depth == 1, ya llegamos al final del arbol
@@ -326,20 +361,20 @@ class CustomPlayer:
                         movRet = move
                     if(ret < beta) :
                         beta = ret
-                print("AB1 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
+                # print("AB1 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
                 if (maximizing_player == True):
                     if (alpha >= beta) :
-                        print("ALPHA > BETA 1 !")
+                        # print("ALPHA > BETA 1 !")
                         return alpha, move
                 else:
                     if (alpha >= beta) :
-                        print("ALPHA > BETA 1 !")
+                        # print("ALPHA > BETA 1 !")
                         return beta, move
 
         else:
             # 1b  If the level is a minimizing level, use MINIMAX on the
             # checar si es minimax level
-            print("Alpha-Beta depth > 1: ", depth)
+            # print("Alpha-Beta depth > 1: ", depth)
             if(maximizing_player == True):
                 ret = float("-inf")
             else:
@@ -348,6 +383,9 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score, movTemp = self.alphabeta(nuevo_tablero, depth-1, alpha, beta, not maximizing_player) 
+                if(movTemp == (-1,-1)):
+                    # print("AQUI SALE DE LA BUSQUEDA 1 !", " score:", score)
+                    return score, movTemp
                 if(maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -360,14 +398,14 @@ class CustomPlayer:
                         movRet = move
                     if(ret < beta) :
                         beta = ret
-                print("AB2 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
+                # print("AB2 Uno score:", score, " move:", movRet, " depth:", depth, " alpha:", alpha, " beta: ", beta)
                 if (maximizing_player == True):
                     if (alpha >= beta) :
-                        print("ALPHA > BETA 1 !")
+                        # print("ALPHA > BETA 1 !")
                         return alpha, move
                 else:
                     if (alpha >= beta) :
-                        print("ALPHA > BETA 1 !")
+                        # print("ALPHA > BETA 1 !")
                         return beta, move
 
         return ret, movRet

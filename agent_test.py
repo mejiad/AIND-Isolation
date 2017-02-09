@@ -141,6 +141,7 @@ def makeEvalStop(limit, timer, value=None):
 
     def score(game, player):
         if timer.time_left() < 0:
+            print("EVAL Stop: ", timer.time_left())
             raise TimeoutError("Timer expired during search. You must " +
                                "return an answer before the timer reaches 0.")
         if limit == game.counts[0]:
@@ -231,9 +232,7 @@ class Project1Test(unittest.TestCase):
     # @unittest.skip("Skip eval function test.")  # Uncomment this line to skip test
     def test_heuristic(self):
         """ Test output interface of heuristic score function interface."""
-        print(" Test output interface of heuristic score function interface.")
 
-        print("--- Test Heuristic")
         player1 = "Player1"
         player2 = "Player2"
         p1_location = (0, 0)
@@ -249,7 +248,6 @@ class Project1Test(unittest.TestCase):
     # @unittest.skip("Skip simple minimax test.")  # Uncomment this line to skip test
     def test_minimax_interface(self):
         """ Test CustomPlayer.minimax interface with simple input """
-        print(" Test CustomPlayer.minimax interface with simple input ")
         h, w = 7, 7  # board size
         test_depth = 1
         starting_location = (5, 3)
@@ -313,7 +311,6 @@ class Project1Test(unittest.TestCase):
     # @unittest.skip("Skip get_move test.")  # Uncomment this line to skip test
     def test_get_move_interface(self):
         """ Test CustomPlayer.get_move interface with simple input """
-        print("Test CustomPlayer.get_move interface with simple input ")
         h, w = 9, 9  # board size
         test_depth = 1
         starting_location = (2, 7)
@@ -373,7 +370,6 @@ class Project1Test(unittest.TestCase):
         If minimax is working properly, it will visit a constant number of
         nodes during the search and return one of the acceptable legal moves.
         """
-        print(" Test CustomPlayer.minimax ...")
         h, w = 7, 7  # board size
         starting_location = (2, 3)
         adversary_location = (0, 0)  # top left corner
@@ -407,7 +403,6 @@ class Project1Test(unittest.TestCase):
         # evaluation function.
         for idx in range(5):
             test_depth = idx + 1
-            print("Probando con depth de " , test_depth)
             agentUT, board = self.initAUT(test_depth, heuristic,
                                           iterative_search, method,
                                           loc1=starting_location,
@@ -441,7 +436,6 @@ class Project1Test(unittest.TestCase):
         has the same growth factor, the expansion and pruning must result in
         an exact number of expanded nodes.
         """
-        print("TEST alphabeta")
         h, w = 101, 101  # board size
         starting_location = (50, 50)
         adversary_location = (0, 0)  # top left corner
@@ -459,7 +453,6 @@ class Project1Test(unittest.TestCase):
         counts = [(8, 8), (17, 10), (74, 42), (139, 51), (540, 119)]
 
         for idx in range(len(counts)):
-            print("COUNTS: ", counts[idx])
             test_depth = idx + 1  # pruning guarantee requires min depth of 3
             first_branch = []
             heuristic = makeBranchEval(first_branch)
@@ -496,7 +489,6 @@ class Project1Test(unittest.TestCase):
         have been expanded, we can then verify that the expected number of
         unique nodes have been visited.
         """
-        print("TEST get move")
 
         class DynamicTimer():
             """Dynamic Timer allows the time limit to be changed after the
