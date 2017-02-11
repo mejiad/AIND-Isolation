@@ -124,6 +124,7 @@ class RandomPlayer():
             no available legal moves.
         """
 
+        # print("Random get_move moves:", legal_moves)
         if not legal_moves:
             return (-1, -1)
         return legal_moves[randint(0, len(legal_moves) - 1)]

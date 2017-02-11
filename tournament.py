@@ -33,6 +33,7 @@ from sample_players import improved_score
 from game_agent import CustomPlayer
 from game_agent import custom_score
 
+# NUM_MATCHES = 5  # number of matches against each opponent
 NUM_MATCHES = 5  # number of matches against each opponent
 TIME_LIMIT = 150  # number of milliseconds before timeout
 
@@ -70,10 +71,17 @@ def play_match(player1, player2):
     games = [Board(player1, player2), Board(player2, player1)]
 
     # initialize both games with a random move and response
-    for _ in range(2):
-        move = random.choice(games[0].get_legal_moves())
-        games[0].apply_move(move)
-        games[1].apply_move(move)
+    # for _ in range(2):
+        # move = random.choice(games[0].get_legal_moves())
+        # games[0].apply_move(move)
+        # games[1].apply_move(move)
+
+
+    games[0].apply_move((4,5))
+    games[0].apply_move((2,4))
+
+    games[1].apply_move((2,4))
+    games[1].apply_move((4,5))
 
     # play both games and tally the results
     for game in games:
@@ -152,16 +160,22 @@ def main():
     mm_agents = [Agent(CustomPlayer(score_fn=h, **MM_ARGS),
                        "MM_" + name) for name, h in HEURISTICS]
     ab_agents = [Agent(CustomPlayer(score_fn=h, **AB_ARGS),
-                       "AB_" + name) for name, h in HEURISTICS]
+                        "AB_" + name) for name, h in HEURISTICS]
     random_agents = [Agent(RandomPlayer(), "Random")]
+
+    # ab_agents = []
+    # random_agents = []
 
     # ID_Improved agent is used for comparison to the performance of the
     # submitted agent for calibration on the performance across different
     # systems; i.e., the performance of the student agent is considered
     # relative to the performance of the ID_Improved agent to account for
     # faster or slower computers.
+
     test_agents = [Agent(CustomPlayer(score_fn=improved_score, **CUSTOM_ARGS), "ID_Improved"),
                    Agent(CustomPlayer(score_fn=custom_score, **CUSTOM_ARGS), "Student")]
+
+    # test_agents = [Agent(CustomPlayer(score_fn=improved_score, **CUSTOM_ARGS), "ID_Improved")] 
 
     print(DESCRIPTION)
     for agentUT in test_agents:

@@ -350,6 +350,8 @@ class Board(object):
         move_history = []
 
         curr_time_millis = lambda: 1000 * timeit.default_timer()
+        # print("Start:")
+        # print(self.print_board())
 
         while True:
 
@@ -373,9 +375,21 @@ class Board(object):
                 move_history[-1].append(curr_move)
 
             if move_end < 0:
+                # print("TIMEOUT de play")
                 return self.__inactive_player__, move_history, "timeout"
 
             if curr_move not in legal_player_moves:
+                # print("ILLEGAL MOVE de play ", curr_move)
                 return self.__inactive_player__, move_history, "illegal move"
 
             self.apply_move(curr_move)
+
+#            if (self.active_player == self.__player_1__):
+#                print("Apply move player 2:")
+#            else: 
+#                print("Apply move player 1:")
+#            print(self.print_board())
+#            if (self.is_winner(self.__player_1__) ):
+#                print("Player 1 gano!")
+#            if( self.is_winner(self.__player_2__)):
+#                print("Player 2 gano!")

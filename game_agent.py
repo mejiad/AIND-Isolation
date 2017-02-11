@@ -37,8 +37,15 @@ def custom_score(game, player):
     # TODO: finish this function!
     # primer intento, regresar le numero de posiciones abiertas para el player...
     # raise NotImplementedError
-    ret = len ( game.get_legal_moves(player) )  * 1.0
-    return ret
+    if game.is_loser(player):
+        return float("-inf")
+
+    if game.is_winner(player):
+        return float("inf")
+
+    own_moves = len(game.get_legal_moves(player))
+    opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
+    return float(own_moves - opp_moves)
 
 
 class CustomPlayer:
@@ -123,7 +130,8 @@ class CustomPlayer:
         # Perform any required initializations, including selecting an initial
         # move from the game board (i.e., an opening book), or returning
         # immediately if there are no legal moves
-        # print("=======\t\tget_move iself.iterative: ", self.iterative, " method:", self.method)
+        # print("get_move iself.iterative: ", self.iterative, " method:", self.method, " Legal moves:", legal_moves)
+        #print("Get Move game agent")
         posAnterior = (-1,-1)
         is_maximizing = True
         if (game.active_player == game.__player_1__):
@@ -138,27 +146,29 @@ class CustomPlayer:
             # when the timer gets close to expiring
             if self.iterative == True:
                 depth = 1
-                while True:
+                for depth in range(1, 8):
                     if (self.method == "minimax"):
                         score, pos =  self.minimax(game, depth, True)
-                        depth = depth + 1
-                        posAnterior = pos
                     else: 
-                        if (self.method == "alphabeta"):
-                            score, pos =  self.alphabeta(game, depth, float("-inf"), float("inf"), is_maximizing)
-                            depth = depth + 1
-                            posAnterior = pos
+                        score, pos =  self.alphabeta(game, depth, float("-inf"), float("inf"), is_maximizing)
+                    if(pos == (-1,-1)):
+                        # print("Sali antes:" , self.method )
+                        return posAnterior
+                    posAnterior = pos
             else:
                 if (self.method == "minimax"):
                     score, pos = self.minimax(game, self.search_depth, is_maximizing)
                 else:
                     score, pos =  self.alphabeta(game,  self.search_depth, float("-inf"), float("inf"), is_maximizing)
+                posAnterior = pos
 
         except Timeout:
             # Handle any actions required at timeout, if necessary
+            # print("PostAnterior timeout ", posAnterior, flush = True)
             return posAnterior
 
         # Return the best move from the last completed search iteration
+        # print("PostAnterior ret:", posAnterior)
         return posAnterior
 
     def minimax(self, game, depth, maximizing_player=True):
@@ -196,6 +206,16 @@ class CustomPlayer:
         # print("<<<<<<<<<<< Minimax 1 depth:", depth)
         # print( game.print_board2(depth))
         moves = game.get_legal_moves() 
+        # print("fepth:", depth, " Moves en minimax:", moves)
+
+        # if (len(moves) == 1) :
+            # return self.score(game,game.__player_1__), moves[0]
+
+        if (len(moves) < 1) :
+            if ( maximizing_player == True) :
+                return float("-inf"),  (-1,-1)
+            else:
+                return float("inf"),  (-1,-1)
 
         # Determine if the limit of search has been reached, or if the 
         # level is a minimizing level, or if the level is a maximizing
@@ -215,8 +235,9 @@ class CustomPlayer:
         # Determine if the limit of search has been reached
         # se alcanza si depth == 1, ya llegamos al final del arbol
         # o si no hay movimientos para este nivel...
-        if (game.utility(game.active_player) != 0):
-            return  game.utility(game.active_player), (-1,-1)
+        # if (game.utility(game.active_player) != 0):
+            # print("------------- minimax SALIO   ",  game.utility(game.active_player))
+            # return  game.utility(game.active_player), (-1,-1)
 
         ret = float("inf")
         movRet = (-1, -1)
@@ -229,7 +250,8 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score = self.score(nuevo_tablero,game.__player_1__)
-                # score = self.score(nuevo_tablero,game.active_player)
+                # score = self.score(nuevo_tablero,nuevo_tablero.active_player)
+                # print("Score depth 1:", score)
                 if (maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -249,9 +271,7 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score, movTemp = self.minimax(nuevo_tablero, depth-1, not maximizing_player) 
-                if(movTemp == (-1,-1)):
-                    return score, movTemp
-
+                # print("Score depth 2:", score)
                 if(maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -307,8 +327,9 @@ class CustomPlayer:
         # raise NotImplementedError
         # print("------------- alphabeta")
         # print("<<<<<<<<<<< Alpha-beta 1 depth:", depth)
-        # print( game.print_board2(depth))
-        moves = game.get_legal_moves() 
+
+        # print( game.print_board())
+        moves = game.get_legal_moves(game.active_player) 
 
         # Determine if the limit of search has been reached, or if the 
         # level is a minimizing level, or if the level is a maximizing
@@ -326,8 +347,18 @@ class CustomPlayer:
 
 
         # TODO: agregar utility
-        if (game.utility(game.active_player) != 0):
-            return  game.utility(game.active_player), (-1,-1)
+        # if (game.utility(game.active_player) != 0):
+            # print("------------- alphabeta SALIO depth: ", depth, " moves:",  moves)
+            # return  game.utility(game.active_player), (-1,-1)
+
+        # if (len(moves) == 1) :
+            # return self.score(game,game.__player_1__), moves[0]
+
+        if (len(moves) < 1) :
+            if ( maximizing_player == True) :
+                return float("-inf"),  (-1,-1)
+            else:
+                return float("inf"),  (-1,-1)
 
         # Determine if the limit of search has been reached
         # se alcanza si depth == 1, ya llegamos al final del arbol
@@ -344,7 +375,7 @@ class CustomPlayer:
             movRet = (-1, -1)
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
-                score = self.score(nuevo_tablero,game.__player_1__)
+                score = self.score(nuevo_tablero, game.__player_1__)
                 if (maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -376,8 +407,9 @@ class CustomPlayer:
             for move in moves:
                 nuevo_tablero = game.forecast_move(move)
                 score, movTemp = self.alphabeta(nuevo_tablero, depth-1, alpha, beta, not maximizing_player) 
-                if(movTemp == (-1,-1)):
-                    return score, movTemp
+                # if(movTemp == (-1,-1)):
+                    # print("Si fue -1,-1 depth:", depth)
+                    # return score, movTemp
                 if(maximizing_player == True):
                     if (score > ret ):
                         ret = score
@@ -398,3 +430,4 @@ class CustomPlayer:
                         return beta, move
 
         return ret, movRet
+

@@ -279,7 +279,7 @@ class Project1Test(unittest.TestCase):
     # @unittest.skip("Skip alphabeta test.")  # Uncomment this line to skip test
     def test_alphabeta_interface(self):
         """ Test CustomPlayer.alphabeta interface with simple input """
-        print(" Test CustomPlayer.alphabeta interface with simple input ")
+        # print(" Test CustomPlayer.alphabeta interface with simple input ")
         h, w = 9, 9  # board size
         test_depth = 1
         starting_location = (2, 7)
